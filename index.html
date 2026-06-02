@@ -2114,8 +2114,44 @@ function closeModal(){
                 </div>
             </div>
         </div>
+    <div style="font-size:0.9rem; color:#ccb9b0; margin: 25px 0 12px; font-weight:bold; padding-left:5px;">
+할인
+</div>
 
+<div class="calc-item discount-option" data-discount="5" onclick="handleItemClick(this)">
+    <div class="item-top">
+        <label class="item-info">
+            <input type="checkbox" class="main-check" onchange="updateTotal()">
+            5% 할인
+        </label>
+    </div>
+</div>
+
+<div class="calc-item discount-option" data-discount="10" onclick="handleItemClick(this)">
+    <div class="item-top">
+        <label class="item-info">
+            <input type="checkbox" class="main-check" onchange="updateTotal()">
+            10% 할인
+        </label>
+    </div>
+</div>
+
+<div class="calc-item discount-option" data-discount="15" onclick="handleItemClick(this)">
+    <div class="item-top">
+        <label class="item-info">
+            <input type="checkbox" class="main-check" onchange="updateTotal()">
+            15% 할인
+        </label>
+    </div>
+</div>
         <div class="total-area">
+            <div id="discount-info"style="
+font-size:14px;
+font-weight:700;
+color:#ff8a3d;
+margin-bottom:10px;
+">
+</div>
             <div style="margin-bottom: 15px;">
                 <span style="font-size: 0.95rem; color: #a39289;">최종 견적 금액</span><br>
                 <span style="font-size: 2.3rem; font-weight: 900; color: #ff8a3d;" id="total-text"><span id="total-val">0</span>원</span>
@@ -2152,26 +2188,53 @@ function closeModal(){
         updateTotal();
     }
 
-    function updateTotal() {
-        let total = 0;
+   function updateTotal() {
+    let total = 0;
 
-        document.querySelectorAll('#WA .main-type').forEach(item => {
-            if (item.querySelector('.main-check').checked) {
-                const price = parseInt(item.dataset.price);
-                const qty = parseInt(item.querySelector('.qty-num').innerText);
-                total += (price * qty);
-            }
-        });
+    document.querySelectorAll('#WA .main-type').forEach(item => {
+        if (item.querySelector('.main-check').checked) {
+            const price = parseInt(item.dataset.price);
+            const qty = parseInt(item.querySelector('.qty-num').innerText);
+            total += price * qty;
+        }
+    });
 
-        document.querySelectorAll('#WA .extra-option').forEach(item => {
-            if (item.querySelector('.main-check').checked) {
-                total += parseInt(item.dataset.price);
-            }
-        });
+    document.querySelectorAll('#WA .extra-option').forEach(item => {
+        if (item.querySelector('.main-check').checked) {
+            total += parseInt(item.dataset.price);
+        }
+    });
 
-        document.getElementById('total-val').innerText = total.toLocaleString();
-        document.getElementById('total-text').style.color = total > 0 ? "#e69500" : "#ff8a3d";
+    let discountPercent = 0;
+
+    document.querySelectorAll('#WA .discount-option').forEach(item => {
+        if (item.querySelector('.main-check').checked) {
+            discountPercent += parseInt(item.dataset.discount);
+        }
+    });
+
+    const originalTotal = total;
+
+    if (discountPercent > 0) {
+        total = Math.floor(total * (100 - discountPercent) / 100);
     }
+
+    document.getElementById('total-val').innerText =
+        total.toLocaleString();
+
+    document.getElementById('total-text').style.color =
+        total > 0 ? "#e69500" : "#ff8a3d";
+
+    const info = document.getElementById('discount-info');
+
+    if(discountPercent > 0){
+        info.innerHTML =
+            `${discountPercent}% 할인 적용 중<br>
+            ${originalTotal.toLocaleString()}원 → ${total.toLocaleString()}원`;
+    }else{
+        info.innerHTML = "";
+    }
+}
 
     function copyFullOrder() {
         const name = document.getElementById('user-name').value || "미작성";
